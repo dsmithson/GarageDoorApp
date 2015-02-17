@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="include/DataPins.h" open="1" top="0" tabpos="5">
+		<Cursor position="329" topLine="0" />
+	</File>
+	<File name="include/GpioPin.h" open="1" top="0" tabpos="2">
+		<Cursor position="747" topLine="0" />
+	</File>
+	<File name="include/ShiftRegisterPins.h" open="1" top="0" tabpos="6">
+		<Cursor position="287" topLine="0" />
+	</File>
+	<File name="main.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="500" topLine="0" />
+	</File>
+	<File name="src/GpioPin.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="1685" topLine="51" />
+	</File>
+	<File name="src/ShiftRegister.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="1080" topLine="0" />
+	</File>
+</CodeBlocks_layout_file>
