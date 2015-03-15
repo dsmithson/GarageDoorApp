@@ -7,7 +7,7 @@
 class ShiftRegister
 {
     public:
-        ShiftRegister(std::string latchGpioNumber, std::string clockGpioNumber, std::string dataGpioNumber);
+        ShiftRegister(unsigned char latchGpioNumber, unsigned char clockGpioNumber, unsigned char dataGpioNumber);
         virtual ~ShiftRegister();
         ShiftRegister(const ShiftRegister&) = delete;               //Delete copy constructor
         ShiftRegister& operator=(const ShiftRegister&) = delete;    //Delete copy assignment

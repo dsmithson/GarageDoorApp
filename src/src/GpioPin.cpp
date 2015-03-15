@@ -6,27 +6,40 @@
 
 using namespace std;
 
-GpioPin::GpioPin(string gpioNumber, PinDirection direction)
+GpioPin::GpioPin(unsigned char gpioNumber, PinDirection direction, bool initialValue)
     : gpioNumber(gpioNumber)
+{
+    Init(gpioNumber, direction, initialValue);
+}
+
+GpioPin::GpioPin(unsigned char gpioNumber, PinDirection direction)
+    : gpioNumber(gpioNumber)
+{
+    Init(gpioNumber, direction, false);
+}
+
+GpioPin::~GpioPin()
+{
+    if(valueStream != nullptr)
+        valueStream->close();
+
+    UnExportPin();
+}
+
+bool GpioPin::Init(unsigned char gpioNumber, PinDirection direction, bool initialValue)
 {
     valueStream = nullptr;
 
     if(ExportPin())
     {
-        if(SetDirection(direction))
+        if(SetDirection(direction) && direction == PinDirection::Out)
         {
-            string gpioPath = "/sys/class/gpio/gpio" + this->gpioNumber + "/value";
+            string gpioPath = "/sys/class/gpio/gpio" + to_string(this->gpioNumber) + "/value";
             valueStream = unique_ptr<ofstream>(new ofstream(gpioPath.c_str()));
+            return SetValue(initialValue);
         }
     }
-}
-
-GpioPin::~GpioPin()
-{
-    UnExportPin();
-
-    if(valueStream != nullptr)
-        valueStream->close();
+    return false;
 }
 
 bool GpioPin::ExportPin()
@@ -34,7 +47,7 @@ bool GpioPin::ExportPin()
     cout << "Exporting pin " << this->gpioNumber << endl;
 
     string exportPath = "/sys/class/gpio/export";
-    return WriteToFile(exportPath, this->gpioNumber);
+    return WriteToFile(exportPath, to_string(this->gpioNumber));
 }
 
 bool GpioPin::UnExportPin()
@@ -42,32 +55,42 @@ bool GpioPin::UnExportPin()
     cout << "UnExporting pin " << this->gpioNumber << endl;
 
     string exportPath = "/sys/class/gpio/unexport";
-    return WriteToFile(exportPath, this->gpioNumber);
+    return WriteToFile(exportPath, to_string(this->gpioNumber));
 }
 
 bool GpioPin::SetDirection(PinDirection direction)
 {
-    string gpioPath = "/sys/class/gpio/gpio" + this->gpioNumber + "/direction";
-
+    string gpioPath = "/sys/class/gpio/gpio" + to_string(this->gpioNumber) + "/direction";
     string value = (direction == PinDirection::In ? "in" : "out");
     return WriteToFile(gpioPath, value);
 }
 
-int GpioPin::GetValue()
+bool GpioPin::GetValue()
 {
-    string gpioPath = "/sys/class/gpio/gpio" + this->gpioNumber + "/value";
+    return GetValue(false);
+}
+
+bool GpioPin::GetValue(bool invert)
+{
+    bool response = false;
+    string gpioPath = "/sys/class/gpio/gpio" + to_string(this->gpioNumber) + "/value";
     ifstream stream(gpioPath.c_str());
     if(stream < 0)
     {
-        cout << " OPERATION FAILED: Unable to get file stream to read GPIO value for " << this->gpioNumber << "." << endl;
-        return -1;
+        cout << " OPERATION FAILED: Unable to get file stream to read GPIO value for " << to_string(this->gpioNumber) << "." << endl;
+    }
+    else
+    {
+        string value;
+        stream >> value;
+        if(value == "1")
+            response = true;
     }
 
-    string value;
-    stream >> value;
-    stream.close();
+    if(invert)
+        response = !response;
 
-    return stoi(value);
+    return response;
 }
 
 bool GpioPin::SetValue(bool value)

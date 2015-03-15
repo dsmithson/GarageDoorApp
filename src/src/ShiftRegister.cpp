@@ -1,6 +1,6 @@
 #include "ShiftRegister.h"
 
-ShiftRegister::ShiftRegister(std::string latchGpioNumber, std::string clockGpioNumber, std::string dataGpioNumber)
+ShiftRegister::ShiftRegister(unsigned char latchGpioNumber, unsigned char clockGpioNumber, unsigned char dataGpioNumber)
     : data(0), latchPin(latchGpioNumber, PinDirection::Out), clockPin(clockGpioNumber, PinDirection::Out), dataPin(dataGpioNumber, PinDirection::Out)
 {
     //Clear the shift register
