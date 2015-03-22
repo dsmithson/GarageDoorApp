@@ -29,18 +29,26 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-Weffc++" />
 			<Add option="-std=c++0x" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 			<Add directory="include" />
+			<Add directory="/usr/local/include" />
 		</Compiler>
+		<Linker>
+			<Add option="-lboost_system -lboost_thread -lpthread" />
+			<Add directory="/usr/local/boost_1_57_0/stage/lib" />
+		</Linker>
 		<Unit filename="include/DataPins.h" />
 		<Unit filename="include/GpioPin.h" />
+		<Unit filename="include/NetworkServer.h" />
+		<Unit filename="include/NetworkSession.h" />
 		<Unit filename="include/ShiftRegister.h" />
 		<Unit filename="include/ShiftRegisterPins.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/GpioPin.cpp" />
+		<Unit filename="src/NetworkServer.cpp" />
+		<Unit filename="src/NetworkSession.cpp" />
 		<Unit filename="src/ShiftRegister.cpp" />
 		<Extensions>
 			<code_completion />

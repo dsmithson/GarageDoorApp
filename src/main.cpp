@@ -1,9 +1,11 @@
 #include <iostream>
 #include <string>
 #include <signal.h>
+#include "NetworkServer.h"
 #include "DataPins.h"
 #include "GpioPin.h"
 #include "ShiftRegister.h"
+#include <boost/thread.hpp>
 #include "ShiftRegisterPins.h"
 #include <chrono>
 #include <thread>
@@ -12,6 +14,7 @@
 #include <sstream>
 
 using namespace std;
+using namespace boost::asio;
 
 const unsigned char doorRelayOutputPin = 17;
 const unsigned char lightRelayOutputPin = 18;
@@ -32,6 +35,9 @@ bool doorButtonPressed = false;
 bool lightButtonPressed = false;
 bool doorClosed = false;
 bool blinkOn = false;
+
+bool toggleDoorRequested = false;
+bool toggleLightRequested = false;
 
 bool hasValueChanged(GpioPin* inputPin, bool* lastValue)
 {
@@ -62,7 +68,7 @@ void sig_handler(int sig)
     exitRequested = true;
 }
 
-int main()
+int main(int argc, char* args[])
 {
     //Hook to be signalled when the app gets a termination signal
     struct sigaction sigStruct;
@@ -90,6 +96,16 @@ int main()
     doorClosed = doorClosedSwitch.GetValue(true);
     redLed.SetValue(!doorClosed);
 
+    //Startup our network server
+    io_service service;
+    NetworkServer networkSrv(service, "password1",
+        []() { return !doorClosed; },
+        []() { return toggleDoorRequested = true; },
+        []() { return toggleLightRequested = true; });
+
+    boost::shared_ptr<boost::thread> serviceThread(new boost::thread(
+        boost::bind(&boost::asio::io_service::run, &service)));
+
     cout << "Environment initialized.  Starting main loop..." << endl;
     while(!exitRequested)
     {
@@ -107,23 +123,43 @@ int main()
         //Check for door switch press event
         if(hasValueChanged(&doorButton, &doorButtonPressed) && doorButtonPressed && doorRelayCountdown <= 0)
         {
-            //Need to activate the door relay
-            doorRelayCountdown = puttonPressIterations;
-            doorRelay.SetValue(true);
+            toggleDoorRequested = true;
         }
 
         //Check for light switch press event
         if(hasValueChanged(&lightButton, &lightButtonPressed) && lightButtonPressed && lightRelayCountdown <= 0)
         {
-            //Need to activate the door relay
-            lightRelayCountdown = puttonPressIterations;
-            lightRelay.SetValue(true);
+            toggleLightRequested = true;
         }
 
         //Update door position switch status
         if(hasValueChanged(&doorClosedSwitch, &doorClosed))
         {
             redLed.SetValue(!doorClosed);
+        }
+
+        //////////////////////////////////////////////////////////////////////
+        //Do we have a requested door/light toggle to process?
+        if(toggleDoorRequested)
+        {
+            if(doorRelayCountdown == 0)
+            {
+                //Need to activate the door relay
+                doorRelayCountdown = puttonPressIterations;
+                doorRelay.SetValue(true);
+            }
+            toggleDoorRequested = false;
+        }
+
+        if(toggleLightRequested)
+        {
+            if(lightRelayCountdown == 0)
+            {
+                //Need to activate the door relay
+                lightRelayCountdown = puttonPressIterations;
+                lightRelay.SetValue(true);
+            }
+            toggleLightRequested = false;
         }
 
         //Sleep until next loop iteration
