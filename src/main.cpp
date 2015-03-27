@@ -24,8 +24,8 @@ const unsigned char lightSwitchInputPin = 23;
 const unsigned char redLedOutputPin = 24;
 const unsigned char blueLedOutputPin = 25;
 
-const int puttonPressIterations = 400;
-const int blinkIterations = 800;
+const int puttonPressIterations = 5;
+const int blinkIterations = 10;
 
 int blinkCountdown = 0;
 int doorRelayCountdown = 0;
@@ -163,7 +163,7 @@ int main(int argc, char* args[])
         }
 
         //Sleep until next loop iteration
-        std::chrono::milliseconds(25);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     cout << "Main loop exited normally.  Exiting now..." << endl;
