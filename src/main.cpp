@@ -1,3 +1,4 @@
+//#include "pi_dht_read.h"
 #include <iostream>
 #include <string>
 #include <signal.h>
@@ -23,18 +24,23 @@ const unsigned char doorSwitchInputPin = 22;
 const unsigned char lightSwitchInputPin = 23;
 const unsigned char redLedOutputPin = 24;
 const unsigned char blueLedOutputPin = 25;
+const unsigned char tempHumidityPin = 4;
 
 const int puttonPressIterations = 5;
 const int blinkIterations = 10;
+const int tempHumidityIterations = 600; // Roughly every 60 seconds
 
 int blinkCountdown = 0;
 int doorRelayCountdown = 0;
 int lightRelayCountdown = 0;
+int tempHumidityCountdown = 0;
 bool exitRequested = false;
 bool doorButtonPressed = false;
 bool lightButtonPressed = false;
 bool doorClosed = false;
 bool blinkOn = false;
+float temperature = 0;
+float humidity = 0;
 
 bool toggleDoorRequested = false;
 bool toggleLightRequested = false;
@@ -58,6 +64,25 @@ void DecrementCountdown(GpioPin* relay, int* iterationsRemaining)
         {
             relay->SetValue(false);
         }
+    }
+}
+
+extern "C" int pi_dht_read(int sensor, int pin, float* humidity, float* temperature);
+
+void ReadTemperatureAndHumidity()
+{
+    const int DHT_SUCCESS = 0;
+    const int DHT11 = 11;
+
+    int result = pi_dht_read(DHT11, tempHumidityPin, &humidity, &temperature);
+    if(result == DHT_SUCCESS)
+    {
+        //TODO:  Log this or something
+        cout << "Temperature: " << temperature << ", Humidity: " << humidity << endl;
+    }
+    else
+    {
+        cout << "Failed to read temp/humidity.  Received result code: " << result << endl;
     }
 }
 
@@ -118,6 +143,12 @@ int main(int argc, char* args[])
             blinkOn = !blinkOn;
             blinkCountdown = blinkIterations;
             blueLed.SetValue(blinkOn);
+        }
+
+        if(--tempHumidityCountdown <= 0)
+        {
+            ReadTemperatureAndHumidity();
+            tempHumidityCountdown = tempHumidityIterations;
         }
 
         //Check for door switch press event

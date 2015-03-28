@@ -56,7 +56,8 @@
 	"GpioPin.h"
 	<string>
 
-1427065134 source:/home/pi/git/GarageDoorApp/src/main.cpp
+1427523720 source:/home/pi/git/GarageDoorApp/src/main.cpp
+	"pi_dht_read.h"
 	<iostream>
 	<string>
 	<signal.h>
@@ -19441,4 +19442,37 @@
 1427055546 /usr/local/include/boost/detail/atomic_undef_macros.hpp
 
 1427055546 /usr/local/include/boost/detail/atomic_redef_macros.hpp
+
+1427524356 /home/pi/git/GarageDoorApp/src/include/pi_dht_read.h
+	"common_dht_read.h"
+
+1427522172 /home/pi/git/GarageDoorApp/src/include/common_dht_read.h
+	<stdint.h>
+
+1427522159 source:/home/pi/git/GarageDoorApp/src/src/common_dht_read.c
+	<errno.h>
+	<sched.h>
+	<string.h>
+	<sys/time.h>
+	<time.h>
+	"common_dht_read.h"
+
+1427519857 source:/home/pi/git/GarageDoorApp/src/src/pi_dht_read.c
+	<stdbool.h>
+	<stdlib.h>
+	"pi_dht_read.h"
+	"pi_mmio.h"
+
+1427519872 /home/pi/git/GarageDoorApp/src/include/pi_mmio.h
+	<stdint.h>
+
+1427519857 source:/home/pi/git/GarageDoorApp/src/src/pi_mmio.c
+	<fcntl.h>
+	<stdlib.h>
+	<string.h>
+	<sys/mman.h>
+	<sys/stat.h>
+	<sys/types.h>
+	<unistd.h>
+	"pi_mmio.h"
 

@@ -36,7 +36,7 @@
 			<Add directory="/usr/local/include" />
 		</Compiler>
 		<Linker>
-			<Add option="-lboost_system -lboost_thread -lpthread" />
+			<Add option="-lboost_system -lboost_thread -lpthread -lrt" />
 			<Add directory="/usr/local/boost_1_57_0/stage/lib" />
 		</Linker>
 		<Unit filename="include/DataPins.h" />
@@ -45,11 +45,23 @@
 		<Unit filename="include/NetworkSession.h" />
 		<Unit filename="include/ShiftRegister.h" />
 		<Unit filename="include/ShiftRegisterPins.h" />
+		<Unit filename="include/common_dht_read.h" />
+		<Unit filename="include/pi_dht_read.h" />
+		<Unit filename="include/pi_mmio.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/GpioPin.cpp" />
 		<Unit filename="src/NetworkServer.cpp" />
 		<Unit filename="src/NetworkSession.cpp" />
 		<Unit filename="src/ShiftRegister.cpp" />
+		<Unit filename="src/common_dht_read.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/pi_dht_read.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/pi_mmio.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<debugger />
