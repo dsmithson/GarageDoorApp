@@ -6,8 +6,8 @@ using namespace boost::asio::ip;
 
 using boost::asio::ip::tcp;
 
-NetworkServer::NetworkServer(io_service& io_service, std::string password, function<bool()> getIsDoorOpen, function<bool()> toggleDoor, function<bool()> toggleLight)
-	: io_service_(io_service), acceptor_(io_service, tcp::endpoint(tcp::v4(), 5174)), password_(password), getIsDoorOpen_(getIsDoorOpen), toggleDoor_(toggleDoor), toggleLight_(toggleLight)
+NetworkServer::NetworkServer(io_service& io_service, std::string password, function<bool()> getIsDoorOpen, function<bool()> toggleDoor, function<bool()> toggleLight, function<float()> getTemperature, function<float()> getHumidity)
+	: io_service_(io_service), acceptor_(io_service, tcp::endpoint(tcp::v4(), 5174)), password_(password), getIsDoorOpen_(getIsDoorOpen), toggleDoor_(toggleDoor), toggleLight_(toggleLight), getTemperature_(getTemperature), getHumidity_(getHumidity)
 {
     start_accept();
 }
@@ -19,7 +19,7 @@ NetworkServer::~NetworkServer()
 
 void NetworkServer::start_accept()
 {
-    NetworkSession* new_session = new NetworkSession(io_service_, password_, getIsDoorOpen_, toggleDoor_, toggleLight_);
+    NetworkSession* new_session = new NetworkSession(io_service_, password_, getIsDoorOpen_, toggleDoor_, toggleLight_, getTemperature_, getHumidity_);
     acceptor_.async_accept(new_session->socket(),
                           boost::bind(&NetworkServer::handle_accept, this, new_session,
                                       boost::asio::placeholders::error));

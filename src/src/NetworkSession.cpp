@@ -2,8 +2,8 @@
 
 using namespace std;
 
-NetworkSession::NetworkSession(boost::asio::io_service& io_service, std::string password, function<bool()> getIsDoorOpen, function<bool()> toggleDoor, function<bool()> toggleLight)
-	: socket_(io_service), password_(password), getIsDoorOpen_(getIsDoorOpen), toggleDoor_(toggleDoor), toggleLight_(toggleLight), userHasAuthenticated(false), userHasRequestedShutdown(false)
+NetworkSession::NetworkSession(boost::asio::io_service& io_service, std::string password, function<bool()> getIsDoorOpen, function<bool()> toggleDoor, function<bool()> toggleLight, function<float()> getTemperature, function<float()> getHumidity)
+	: socket_(io_service), password_(password), getIsDoorOpen_(getIsDoorOpen), toggleDoor_(toggleDoor), toggleLight_(toggleLight), getTemperature_(getTemperature), getHumidity_(getHumidity), userHasAuthenticated(false), userHasRequestedShutdown(false)
 {
 }
 
@@ -132,6 +132,18 @@ void NetworkSession::process_buffer()
 	else if (msgBuffer == "togglelight")
 	{
 		actionSucceeded = toggleLight_();
+	}
+	else if(msgBuffer == "gettemperature" || msgBuffer == "gettemp")
+	{
+	    float temperature = getTemperature_();
+	    write_string(to_string(temperature));
+	    sendResponse = false;
+	}
+	else if(msgBuffer == "gethumidity")
+	{
+	    float humidity = getHumidity_();
+	    write_string(to_string(humidity));
+	    sendResponse = false;
 	}
 	else if (msgBuffer == "bye")
 	{

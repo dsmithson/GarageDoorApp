@@ -34,8 +34,6 @@ bool GpioPin::Init(unsigned char gpioNumber, PinDirection direction, bool initia
     {
         if(SetDirection(direction) && direction == PinDirection::Out)
         {
-            string gpioPath = "/sys/class/gpio/gpio" + to_string(this->gpioNumber) + "/value";
-            valueStream = unique_ptr<ofstream>(new ofstream(gpioPath.c_str()));
             return SetValue(initialValue);
         }
     }
@@ -60,9 +58,28 @@ bool GpioPin::UnExportPin()
 
 bool GpioPin::SetDirection(PinDirection direction)
 {
+    if(valueStream != nullptr)
+    {
+        valueStream->close();
+        valueStream = nullptr;
+    }
+
     string gpioPath = "/sys/class/gpio/gpio" + to_string(this->gpioNumber) + "/direction";
     string value = (direction == PinDirection::In ? "in" : "out");
-    return WriteToFile(gpioPath, value);
+    bool success = WriteToFile(gpioPath, value);
+
+    if(valueStream != nullptr)
+    {
+        valueStream->close();
+        valueStream = nullptr;
+    }
+
+    if(success && direction == PinDirection::Out)
+    {
+        string gpioPath = "/sys/class/gpio/gpio" + to_string(this->gpioNumber) + "/value";
+        valueStream = unique_ptr<ofstream>(new ofstream(gpioPath.c_str()));
+    }
+    return success;
 }
 
 bool GpioPin::GetValue()
