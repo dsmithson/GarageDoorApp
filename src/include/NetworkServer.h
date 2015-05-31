@@ -15,7 +15,7 @@ class NetworkServer
 {
     public:
 
-        NetworkServer(boost::asio::io_service& service, std::string password, std::function<bool()> getIsDoorOpen, std::function<bool()> toggleDoor, std::function<bool()> toggleLight);
+        NetworkServer(boost::asio::io_service& service, std::string password, std::function<bool()> getIsDoorOpen, std::function<bool()> toggleDoor, std::function<bool()> toggleLight, std::function<float()> getTemperature, std::function<float()> getHumidity);
         virtual ~NetworkServer();
 
     private:
@@ -25,6 +25,8 @@ class NetworkServer
 		std::function<bool()> getIsDoorOpen_;
 		std::function<bool()> toggleLight_;
 		std::function<bool()> toggleDoor_;
+		std::function<float()> getTemperature_;
+		std::function<float()> getHumidity_;
         void start_accept();
         void handle_accept(NetworkSession* new_session, const boost::system::error_code& error);
 };

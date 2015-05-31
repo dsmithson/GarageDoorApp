@@ -12,7 +12,7 @@ using boost::asio::ip::tcp;
 class NetworkSession
 {
     public:
-		NetworkSession(boost::asio::io_service& service, std::string password, std::function<bool()> getIsDoorOpen, std::function<bool()> toggleDoor, std::function<bool()> toggleLight);
+		NetworkSession(boost::asio::io_service& service, std::string password, std::function<bool()> getIsDoorOpen, std::function<bool()> toggleDoor, std::function<bool()> toggleLight, std::function<float()> getTemperature, std::function<float()> getHumidity);
         virtual ~NetworkSession();
         tcp::socket& socket() { return socket_; }
         void start();
@@ -28,6 +28,8 @@ class NetworkSession
 		std::function<bool()> getIsDoorOpen_;
 		std::function<bool()> toggleDoor_;
 		std::function<bool()> toggleLight_;
+		std::function<float()> getTemperature_;
+		std::function<float()> getHumidity_;
 		std::string msgBuffer;
         tcp::socket socket_;
         enum { max_length = 1024 };

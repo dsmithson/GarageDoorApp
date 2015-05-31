@@ -46,7 +46,7 @@
 		<Unit filename="include/ShiftRegister.h" />
 		<Unit filename="include/ShiftRegisterPins.h" />
 		<Unit filename="include/common_dht_read.h" />
-		<Unit filename="include/pi_dht_read.h" />
+		<Unit filename="include/dht11.h" />
 		<Unit filename="include/pi_mmio.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/GpioPin.cpp" />
@@ -56,9 +56,7 @@
 		<Unit filename="src/common_dht_read.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/pi_dht_read.c">
-			<Option compilerVar="CC" />
-		</Unit>
+		<Unit filename="src/dht11.cpp" />
 		<Unit filename="src/pi_mmio.c">
 			<Option compilerVar="CC" />
 		</Unit>

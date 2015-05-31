@@ -8,6 +8,7 @@
 #include "ShiftRegister.h"
 #include <boost/thread.hpp>
 #include "ShiftRegisterPins.h"
+#include "dht11.h"
 #include <chrono>
 #include <thread>
 #include <signal.h>
@@ -67,18 +68,16 @@ void DecrementCountdown(GpioPin* relay, int* iterationsRemaining)
     }
 }
 
-extern "C" int pi_dht_read(int sensor, int pin, float* humidity, float* temperature);
-
-void ReadTemperatureAndHumidity()
+void ReadTemperatureAndHumidity(dht11& sensor)
 {
-    const int DHT_SUCCESS = 0;
-    const int DHT11 = 11;
 
-    int result = pi_dht_read(DHT11, tempHumidityPin, &humidity, &temperature);
-    if(result == DHT_SUCCESS)
+    int result = sensor.read();
+    if(result == 0)
     {
         //TODO:  Log this or something
-        cout << "Temperature: " << temperature << ", Humidity: " << humidity << endl;
+        temperature = sensor.temperature;
+        humidity = sensor.humidity;
+        cout << "Temperature: " << sensor.temperature << ", Humidity: " << sensor.humidity << endl;
     }
     else
     {
@@ -89,7 +88,7 @@ void ReadTemperatureAndHumidity()
 void sig_handler(int sig)
 {
     //Using write below instead of cout because this function must be reentrant
-    write(0, "nCtrl^C pressed in sig handler", 32);
+    write(0, "Ctrl+C pressed in sig handler\r\n"", 32);
     exitRequested = true;
 }
 
@@ -116,6 +115,7 @@ int main(int argc, char* args[])
     GpioPin blueLed(blueLedOutputPin, PinDirection::Out);
     GpioPin doorRelay(doorRelayOutputPin, PinDirection::Out);
     GpioPin lightRelay(lightRelayOutputPin, PinDirection::Out);
+    dht11 tempHumiditySensor(tempHumidityPin);
 
     //Set initial state
     doorClosed = doorClosedSwitch.GetValue(true);
@@ -126,7 +126,9 @@ int main(int argc, char* args[])
     NetworkServer networkSrv(service, "password1",
         []() { return !doorClosed; },
         []() { return toggleDoorRequested = true; },
-        []() { return toggleLightRequested = true; });
+        []() { return toggleLightRequested = true; },
+        []() { return temperature; },
+        []() { return humidity; });
 
     boost::shared_ptr<boost::thread> serviceThread(new boost::thread(
         boost::bind(&boost::asio::io_service::run, &service)));
@@ -147,7 +149,7 @@ int main(int argc, char* args[])
 
         if(--tempHumidityCountdown <= 0)
         {
-            ReadTemperatureAndHumidity();
+            ReadTemperatureAndHumidity(tempHumiditySensor);
             tempHumidityCountdown = tempHumidityIterations;
         }
 

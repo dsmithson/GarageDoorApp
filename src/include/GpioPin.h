@@ -22,6 +22,7 @@ class GpioPin
         bool GetValue();
         bool GetValue(bool invert);
         bool SetValue(bool value);
+        bool SetDirection(PinDirection direction);
         GpioPin(const GpioPin&) = delete;               //Delete copy constructor
         GpioPin& operator=(const GpioPin&) = delete;    //Delete copy assignment
 
@@ -29,8 +30,6 @@ class GpioPin
         bool Init(unsigned char gpioNumber, PinDirection direction, bool initialValue);
         bool ExportPin();
         bool UnExportPin();
-        bool SetDirection(PinDirection direction);
-
         bool WriteToFile(std::string file, std::string value);
 
         std::unique_ptr<std::ofstream> valueStream;
